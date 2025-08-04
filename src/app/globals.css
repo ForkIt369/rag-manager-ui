@@ -3,6 +3,17 @@
 @tailwind utilities;
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
 
+/* Cyber color definitions */
+@layer base {
+  :root {
+    --neon-cyan: #00D9FF;
+    --neon-purple: #FF00FF;
+    --neon-lime: #00FF88;
+    --neon-pink: #FF0080;
+    --neon-blue: #0080FF;
+  }
+}
+
 @layer base {
   :root {
     --background: 240 10% 8%;
@@ -65,9 +76,9 @@
     border-color: hsl(var(--border));
   }
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    font-family: 'Rajdhani', sans-serif;
+    background-color: #0A0A0F;
+    color: #E0F2FE;
+    font-family: var(--font-rajdhani), 'Rajdhani', sans-serif;
     background-image: 
       radial-gradient(circle at 25% 25%, rgba(0, 217, 255, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 75% 75%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
@@ -111,10 +122,39 @@
   }
 
   .neon-text {
-    @apply text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-lime;
+    background: linear-gradient(to right, #00D9FF, #FF00FF, #00FF88);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
     text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
     animation: neon-pulse 2s ease-in-out infinite alternate;
   }
+  
+  .text-neon-cyan { color: #00D9FF !important; }
+  .text-neon-purple { color: #FF00FF !important; }
+  .text-neon-lime { color: #00FF88 !important; }
+  .text-neon-pink { color: #FF0080 !important; }
+  .text-neon-blue { color: #0080FF !important; }
+  
+  .bg-neon-cyan { background-color: #00D9FF !important; }
+  .bg-neon-purple { background-color: #FF00FF !important; }
+  .bg-neon-lime { background-color: #00FF88 !important; }
+  .bg-neon-pink { background-color: #FF0080 !important; }
+  .bg-neon-blue { background-color: #0080FF !important; }
+  
+  .from-neon-cyan { --tw-gradient-from: #00D9FF !important; }
+  .from-neon-purple { --tw-gradient-from: #FF00FF !important; }
+  .from-neon-lime { --tw-gradient-from: #00FF88 !important; }
+  .via-neon-cyan { --tw-gradient-via: #00D9FF !important; }
+  .via-neon-purple { --tw-gradient-via: #FF00FF !important; }
+  .via-neon-lime { --tw-gradient-via: #00FF88 !important; }
+  .to-neon-cyan { --tw-gradient-to: #00D9FF !important; }
+  .to-neon-purple { --tw-gradient-to: #FF00FF !important; }
+  .to-neon-lime { --tw-gradient-to: #00FF88 !important; }
+  
+  .font-tech { font-family: var(--font-orbitron), 'Orbitron', monospace !important; }
+  .font-cyber { font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important; }
 
   .cyber-grid {
     background-image: 
