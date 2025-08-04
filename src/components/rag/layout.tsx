@@ -118,7 +118,7 @@ export function RAGLayout({ children, activeTab = 'upload', onTabChange }: RAGLa
       <CyberParticles />
       
       {/* Header */}
-      <header className="border-b border-primary/20 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 cyber-border">
+      <header className="border-b border-primary/20 bg-black/80 backdrop-blur sticky top-0 z-50 cyber-border">
         <div className="flex h-20 items-center gap-4 px-6">
           {/* Menu Toggle */}
           <Button

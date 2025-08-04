@@ -9,6 +9,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      backdropFilter: {
+        'none': 'none',
+        'blur': 'blur(20px)',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -64,8 +68,8 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        'tech': ['Orbitron', 'monospace'],
-        'cyber': ['Rajdhani', 'sans-serif'],
+        'tech': ['var(--font-orbitron)', 'monospace'],
+        'cyber': ['var(--font-rajdhani)', 'sans-serif'],
       },
       animation: {
         'neon-pulse': 'neon-pulse 2s ease-in-out infinite alternate',
@@ -123,7 +127,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")],
 } satisfies Config;
 
 export default config;

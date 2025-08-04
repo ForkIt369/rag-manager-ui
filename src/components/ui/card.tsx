@@ -9,7 +9,8 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border border-primary/20 bg-card/80 backdrop-blur-md text-card-foreground shadow-lg relative overflow-hidden",
+      "rounded-lg border border-primary/20 text-card-foreground shadow-lg relative overflow-hidden",
+      "bg-black/80 backdrop-blur",
       // Add subtle neon glow effect
       "before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-neon-cyan/10 before:via-neon-purple/5 before:to-neon-lime/10 before:-z-10",
       // Hover effects
@@ -76,7 +77,8 @@ const BroCard = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border border-primary/30 bg-card/90 backdrop-blur-md text-card-foreground shadow-xl relative overflow-hidden",
+      "rounded-lg border border-primary/30 text-card-foreground shadow-xl relative overflow-hidden",
+      "bg-black/90 backdrop-blur",
       // Cyber glow background
       "before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-neon-cyan/15 before:via-neon-purple/10 before:to-neon-lime/15 before:-z-10",
       // Animated border for glowing variant

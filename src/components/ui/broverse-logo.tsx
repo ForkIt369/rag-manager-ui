@@ -127,7 +127,7 @@ export function BroVerseLogo({
           size === 'lg' && 'text-sm',
           size === 'xl' && 'text-base'
         )}>
-          Knowledge Intelligence Platform
+          The Ultimate Knowledge Intelligence Platform
         </span>
       </div>
     </div>
