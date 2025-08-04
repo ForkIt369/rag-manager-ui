@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Rajdhani, Orbitron } from "next/font/google";
-import "./app.css";
+import "./globals.css";
 
 const rajdhani = Rajdhani({
   variable: "--font-rajdhani",
@@ -64,6 +64,36 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <style dangerouslySetInnerHTML={{ __html: `
+          :root {
+            --font-rajdhani: ${rajdhani.style.fontFamily};
+            --font-orbitron: ${orbitron.style.fontFamily};
+          }
+          body {
+            background-color: #0A0A0F !important;
+            color: #E0F2FE !important;
+            font-family: ${rajdhani.style.fontFamily}, sans-serif !important;
+            background-image: 
+              radial-gradient(circle at 25% 25%, rgba(0, 217, 255, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 75% 75%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+              linear-gradient(rgba(0, 217, 255, 0.05) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0, 217, 255, 0.05) 1px, transparent 1px) !important;
+            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px !important;
+            background-attachment: fixed !important;
+          }
+          .text-neon-cyan { color: #00D9FF !important; }
+          .text-neon-purple { color: #FF00FF !important; }
+          .text-neon-lime { color: #00FF88 !important; }
+          .text-neon-pink { color: #FF0080 !important; }
+          .text-neon-blue { color: #0080FF !important; }
+          .bg-neon-cyan { background-color: #00D9FF !important; }
+          .bg-neon-purple { background-color: #FF00FF !important; }
+          .bg-neon-lime { background-color: #00FF88 !important; }
+          .bg-neon-pink { background-color: #FF0080 !important; }
+          .bg-neon-blue { background-color: #0080FF !important; }
+          .font-tech { font-family: ${orbitron.style.fontFamily}, monospace !important; }
+          .font-cyber { font-family: ${rajdhani.style.fontFamily}, sans-serif !important; }
+        ` }} />
       </head>
       <body
         className={`${rajdhani.variable} ${orbitron.variable} font-cyber antialiased min-h-screen`}
