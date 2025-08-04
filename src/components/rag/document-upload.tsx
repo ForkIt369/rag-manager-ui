@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, File, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Upload, File, X, CheckCircle, AlertCircle, Loader2, Zap, FileCode, Database } from 'lucide-react';
 import { Card, BroCard, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button, BroButton } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -10,6 +10,15 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { FileUpload } from '@/types';
 import { ragApi } from '@/lib/convex';
+import { 
+  HolographicCard, 
+  CyberGlitchText, 
+  NeonGlowEffect,
+  CyberButton,
+  FloatingParticles,
+  PulsingOrb
+} from '@/components/ui/cyber-effects';
+import { CyberSpinner, QuantumLoader, GlitchLoader } from '@/components/ui/cyber-loading';
 
 interface DocumentUploadProps {
   onUploadComplete?: (documentId: string) => void;
@@ -123,9 +132,9 @@ export function DocumentUpload({ onUploadComplete, className }: DocumentUploadPr
       case 'pending':
         return <File className="h-4 w-4 text-muted-foreground" />;
       case 'uploading':
-        return <Loader2 className="h-4 w-4 animate-spin text-neon-cyan" />;
+        return <CyberSpinner size="small" />;
       case 'processing':
-        return <Loader2 className="h-4 w-4 animate-spin text-neon-purple" />;
+        return <Database className="h-4 w-4 text-neon-purple animate-pulse" />;
       case 'completed':
         return <CheckCircle className="h-4 w-4 text-neon-lime" />;
       case 'error':
@@ -173,23 +182,34 @@ export function DocumentUpload({ onUploadComplete, className }: DocumentUploadPr
 
   return (
     <div className={cn('space-y-8', className)}>
-      {/* Hero Section */}
-      <div className="text-center space-y-4 mb-8">
-        <h1 className="text-4xl font-tech font-bold neon-text">
-          Document Upload Center
-        </h1>
+      {/* Hero Section with Cyber Effects */}
+      <div className="text-center space-y-4 mb-8 relative">
+        <NeonGlowEffect color="cyan" intensity="high">
+          <CyberGlitchText 
+            text="Document Upload Center" 
+            className="text-4xl font-tech font-bold text-neon-cyan"
+            glitchInterval={5000}
+          />
+        </NeonGlowEffect>
         <p className="text-lg text-muted-foreground font-cyber">
           Power up your knowledge base with cutting-edge document intelligence
         </p>
+        <div className="absolute -top-8 -right-8">
+          <PulsingOrb size={60} color="purple" className="opacity-50" />
+        </div>
+        <div className="absolute -bottom-8 -left-8">
+          <PulsingOrb size={80} color="lime" className="opacity-30" />
+        </div>
       </div>
 
-      <BroCard glowing>
-        <CardHeader>
+      <HolographicCard className="p-0">
+        <CardHeader className="p-6">
           <CardTitle className="flex items-center gap-3 text-2xl">
-            <div className="p-2 rounded-lg bg-gradient-to-r from-neon-cyan to-neon-purple">
-              <Upload className="h-6 w-6 text-background" />
+            <div className="p-2 rounded-lg bg-gradient-to-r from-neon-cyan to-neon-purple relative">
+              <Upload className="h-6 w-6 text-background relative z-10" />
+              <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan to-neon-purple blur-xl opacity-70 animate-pulse" />
             </div>
-            <span className="font-tech">UPLOAD DOCUMENTS</span>
+            <span className="font-tech bg-gradient-to-r from-neon-cyan to-neon-purple bg-clip-text text-transparent">UPLOAD DOCUMENTS</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -211,16 +231,24 @@ export function DocumentUpload({ onUploadComplete, className }: DocumentUploadPr
             ) : (
               <div className="space-y-6">
                 <div className="relative">
-                  <Upload className="mx-auto h-20 w-20 text-neon-cyan/70 floating-element" />
-                  <div className="absolute inset-0 bg-neon-cyan/20 rounded-full blur-xl opacity-50" />
+                  <NeonGlowEffect color="cyan" intensity="medium">
+                    <Upload className="mx-auto h-20 w-20 text-neon-cyan" />
+                  </NeonGlowEffect>
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2">
+                    <Zap className="h-8 w-8 text-neon-purple animate-pulse" style={{ animation: 'orbit 4s linear infinite' }} />
+                  </div>
                 </div>
                 <div className="space-y-3">
                   <p className="text-xl font-bold font-tech text-foreground">
                     DRAG & DROP FILES OR CLICK TO SELECT
                   </p>
                   <div className="flex flex-wrap justify-center gap-2 text-sm">
-                    {['PDF', 'DOCX', 'EPUB', 'XLSX', 'CSV', 'HTML', 'TXT', 'JSON', 'MD'].map((type) => (
-                      <Badge key={type} className="bg-neon-purple/20 text-neon-purple border-neon-purple/30">
+                    {['PDF', 'DOCX', 'EPUB', 'XLSX', 'CSV', 'HTML', 'TXT', 'JSON', 'MD'].map((type, index) => (
+                      <Badge 
+                        key={type} 
+                        className="bg-neon-purple/20 text-neon-purple border-neon-purple/30 hover:bg-neon-purple/30 hover:scale-110 transition-all duration-300"
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
                         {type}
                       </Badge>
                     ))}
@@ -233,16 +261,17 @@ export function DocumentUpload({ onUploadComplete, className }: DocumentUploadPr
             )}
           </div>
         </CardContent>
-      </BroCard>
+      </HolographicCard>
 
       {uploads.length > 0 && (
-        <BroCard>
-          <CardHeader>
+        <HolographicCard className="p-0">
+          <CardHeader className="p-6">
             <CardTitle className="flex items-center gap-3 text-xl">
-              <div className="p-2 rounded-lg bg-gradient-to-r from-neon-purple to-neon-lime">
-                <Loader2 className="h-5 w-5 text-background animate-spin" />
+              <div className="p-2 rounded-lg bg-gradient-to-r from-neon-purple to-neon-lime relative">
+                <FileCode className="h-5 w-5 text-background relative z-10" />
+                <div className="absolute inset-0 bg-gradient-to-r from-neon-purple to-neon-lime blur-xl opacity-70 animate-pulse" />
               </div>
-              <span className="font-tech">UPLOAD PROGRESS</span>
+              <span className="font-tech bg-gradient-to-r from-neon-purple to-neon-lime bg-clip-text text-transparent">UPLOAD PROGRESS</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -265,15 +294,15 @@ export function DocumentUpload({ onUploadComplete, className }: DocumentUploadPr
                     </div>
                     <div className="flex items-center gap-3">
                       {getStatusBadge(upload.status)}
-                      <Button
+                      <CyberButton
                         variant="ghost"
-                        size="icon"
+                        size="small"
                         onClick={() => removeUpload(index)}
                         disabled={upload.status === 'uploading' || upload.status === 'processing'}
-                        className="hover:bg-destructive/20 hover:text-destructive"
+                        className="hover:bg-destructive/20 hover:text-destructive p-2"
                       >
                         <X className="h-4 w-4" />
-                      </Button>
+                      </CyberButton>
                     </div>
                   </div>
                   
@@ -283,7 +312,7 @@ export function DocumentUpload({ onUploadComplete, className }: DocumentUploadPr
                         value={upload.progress} 
                         className="h-3 bg-muted/50"
                       />
-                      <p className="text-xs text-center font-mono text-neon-cyan">
+                      <p className="text-xs text-center font-mono text-neon-cyan animate-pulse">
                         {upload.status === 'uploading' ? 'UPLOADING...' : 'PROCESSING...'}
                       </p>
                     </div>
@@ -296,16 +325,20 @@ export function DocumentUpload({ onUploadComplete, className }: DocumentUploadPr
                   )}
 
                   {upload.status === 'completed' && (
-                    <div className="p-3 rounded-lg bg-neon-lime/10 border border-neon-lime/20 text-center">
-                      <p className="text-xs text-neon-lime font-cyber font-bold">UPLOAD COMPLETE</p>
+                    <div className="p-3 rounded-lg bg-neon-lime/10 border border-neon-lime/20 text-center relative overflow-hidden">
+                      <p className="text-xs text-neon-lime font-cyber font-bold animate-neon-pulse">UPLOAD COMPLETE</p>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-neon-lime/20 to-transparent animate-slide" />
                     </div>
                   )}
                 </div>
               ))}
             </div>
           </CardContent>
-        </BroCard>
+        </HolographicCard>
       )}
+      
+      {/* Floating particles effect */}
+      <FloatingParticles />
     </div>
   );
 }

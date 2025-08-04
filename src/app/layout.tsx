@@ -187,6 +187,128 @@ export default function RootLayout({
           /* Upload area styling */
           .border-dashed { border-style: dashed !important; }
           .border-2 { border-width: 2px !important; }
+          
+          /* Custom animations */
+          @keyframes orbit {
+            from { transform: rotate(0deg) translateX(40px) translateY(-50%) rotate(0deg); }
+            to { transform: rotate(360deg) translateX(40px) translateY(-50%) rotate(-360deg); }
+          }
+          
+          @keyframes slide {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+          }
+          
+          @keyframes shimmer {
+            100% { transform: translateX(100%); }
+          }
+          
+          @keyframes float-up {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+          }
+          
+          @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+          }
+          
+          @keyframes cyber-glow {
+            0%, 100% { 
+              box-shadow: 0 0 20px rgba(0, 217, 255, 0.5), inset 0 0 20px rgba(0, 217, 255, 0.1);
+            }
+            50% { 
+              box-shadow: 0 0 40px rgba(255, 0, 255, 0.5), inset 0 0 40px rgba(255, 0, 255, 0.1);
+            }
+          }
+          
+          @keyframes neon-pulse {
+            0% { 
+              text-shadow: 0 0 5px #00D9FF, 0 0 10px #00D9FF, 0 0 15px #00D9FF;
+              box-shadow: 0 0 5px #00D9FF;
+            }
+            100% { 
+              text-shadow: 0 0 10px #00D9FF, 0 0 20px #00D9FF, 0 0 30px #00D9FF;
+              box-shadow: 0 0 10px #00D9FF, 0 0 20px #00D9FF;
+            }
+          }
+          
+          /* Animation utilities */
+          .animate-spin-slow { animation: spin 3s linear infinite; }
+          .animate-spin-reverse { animation: spin 2s linear infinite reverse; }
+          .animate-float { animation: float-up 30s linear infinite; }
+          .animate-shimmer { animation: shimmer 2s infinite; }
+          .animate-slide { animation: slide 2s ease-in-out infinite; }
+          .animate-cyber-glow { animation: cyber-glow 3s ease-in-out infinite; }
+          .animate-neon-pulse { animation: neon-pulse 2s ease-in-out infinite alternate; }
+          
+          /* Glass morphism */
+          .glass {
+            background: rgba(0, 0, 0, 0.4) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(0, 217, 255, 0.2) !important;
+          }
+          
+          /* Neon glow text */
+          .neon-glow {
+            text-shadow: 
+              0 0 10px currentColor,
+              0 0 20px currentColor,
+              0 0 30px currentColor,
+              0 0 40px currentColor !important;
+          }
+          
+          /* Cyber grid enhanced */
+          .cyber-grid-animated {
+            background-image: 
+              linear-gradient(rgba(0, 217, 255, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0, 217, 255, 0.1) 1px, transparent 1px),
+              radial-gradient(circle at 25% 25%, rgba(0, 217, 255, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 75% 75%, rgba(255, 0, 255, 0.05) 0%, transparent 50%) !important;
+            background-size: 50px 50px, 50px 50px, 100% 100%, 100% 100% !important;
+            animation: cyber-grid-move 20s linear infinite !important;
+          }
+          
+          @keyframes cyber-grid-move {
+            0% { background-position: 0 0, 0 0, 0% 0%, 100% 100%; }
+            100% { background-position: 50px 50px, 50px 50px, 100% 100%, 0% 0%; }
+          }
+          
+          /* Enhanced buttons */
+          .cyber-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+          }
+          
+          .cyber-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+          }
+          
+          .cyber-button:hover::before {
+            left: 100%;
+          }
+          
+          /* Card depth effect */
+          .card-3d {
+            transform-style: preserve-3d;
+            transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+            transition: transform 0.6s;
+          }
+          
+          .card-3d:hover {
+            transform: perspective(1000px) rotateX(-10deg) rotateY(10deg);
+          }
         ` }} />
       </head>
       <body

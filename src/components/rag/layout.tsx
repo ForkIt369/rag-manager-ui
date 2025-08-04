@@ -16,7 +16,10 @@ import {
   Monitor,
   Zap,
   Activity,
-  Shield
+  Shield,
+  Cpu,
+  HardDrive,
+  Wifi
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -30,6 +33,14 @@ import {
 import { cn } from '@/lib/utils';
 import { NavItem } from '@/types';
 import { BroVerseLogo, CyberParticles } from '@/components/ui/broverse-logo';
+import { 
+  MatrixRain, 
+  ScanlineEffect, 
+  CyberButton,
+  NeonGlowEffect,
+  PulsingOrb
+} from '@/components/ui/cyber-effects';
+import { CyberSpinner } from '@/components/ui/cyber-loading';
 
 interface RAGLayoutProps {
   children: React.ReactNode;
@@ -114,6 +125,12 @@ export function RAGLayout({ children, activeTab = 'upload', onTabChange }: RAGLa
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Matrix Rain Background */}
+      <MatrixRain className="opacity-5" />
+      
+      {/* Scanline Effect */}
+      <ScanlineEffect className="opacity-[0.02]" />
+      
       {/* Cyber Particles Background */}
       <CyberParticles />
       
@@ -121,44 +138,43 @@ export function RAGLayout({ children, activeTab = 'upload', onTabChange }: RAGLa
       <header className="border-b border-primary/20 bg-black/80 backdrop-blur sticky top-0 z-50 cyber-border">
         <div className="flex h-20 items-center gap-4 px-6">
           {/* Menu Toggle */}
-          <Button
+          <CyberButton
             variant="ghost"
-            size="icon"
+            size="small"
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden bro-button"
+            className="lg:hidden"
           >
-            <div className="bro-button-inner">
-              {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </div>
-          </Button>
+            {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </CyberButton>
 
           {/* Logo */}
           <BroVerseLogo size="md" className="flex-shrink-0" />
 
           <div className="ml-auto flex items-center gap-4">
             {/* System Status Indicator */}
-            <div className="hidden md:flex items-center gap-2 text-xs">
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-neon-lime rounded-full animate-pulse" />
-                <span className="text-neon-lime font-medium">ONLINE</span>
+            <div className="hidden md:flex items-center gap-4 text-xs relative">
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/50 border border-neon-lime/30">
+                <PulsingOrb size={8} color="lime" className="scale-75" />
+                <span className="text-neon-lime font-medium font-tech">SYSTEM ONLINE</span>
               </div>
-              <Separator orientation="vertical" className="h-4" />
-              <div className="flex items-center gap-1">
-                <Activity className="h-3 w-3 text-neon-cyan" />
-                <span className="text-muted-foreground">99.9%</span>
+              <div className="flex items-center gap-2">
+                <Activity className="h-3 w-3 text-neon-cyan animate-pulse" />
+                <span className="text-neon-cyan font-mono">99.9%</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Cpu className="h-3 w-3 text-neon-purple animate-pulse" />
+                <span className="text-neon-purple font-mono">42%</span>
               </div>
             </div>
 
             {/* Theme Toggle */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="bro-button">
-                  <div className="bro-button-inner">
-                    {theme === 'light' && <Sun className="h-5 w-5" />}
-                    {theme === 'dark' && <Moon className="h-5 w-5" />}
-                    {theme === 'system' && <Monitor className="h-5 w-5" />}
-                  </div>
-                </div>
+                <CyberButton variant="ghost" size="small" className="relative">
+                  {theme === 'light' && <Sun className="h-5 w-5 text-yellow-400" />}
+                  {theme === 'dark' && <Moon className="h-5 w-5 text-neon-purple" />}
+                  {theme === 'system' && <Monitor className="h-5 w-5 text-neon-cyan" />}
+                </CyberButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bro-card border-primary/20">
                 <DropdownMenuItem onClick={() => toggleTheme('light')}>
@@ -205,10 +221,17 @@ export function RAGLayout({ children, activeTab = 'upload', onTabChange }: RAGLa
                   )}
                 >
                   <div className={cn(
-                    'transition-colors duration-300',
+                    'transition-all duration-300 relative',
                     activeTab === item.href ? 'text-neon-cyan' : 'group-hover:text-neon-cyan'
                   )}>
-                    {getIcon(item.icon)}
+                    {activeTab === item.href && (
+                      <NeonGlowEffect color="cyan" intensity="medium" className="absolute inset-0">
+                        <div className="w-full h-full" />
+                      </NeonGlowEffect>
+                    )}
+                    <div className="relative z-10">
+                      {getIcon(item.icon)}
+                    </div>
                   </div>
                   <span className="flex-1 font-cyber">{item.title}</span>
                   {item.badge && (
@@ -217,13 +240,19 @@ export function RAGLayout({ children, activeTab = 'upload', onTabChange }: RAGLa
                     </Badge>
                   )}
                   {activeTab === item.href && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan/10 via-neon-purple/10 to-neon-lime/10 rounded-lg -z-10" />
+                    <>
+                      <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan/10 via-neon-purple/10 to-neon-lime/10 rounded-lg -z-10" />
+                      <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-lime rounded-lg blur opacity-20 group-hover:opacity-30 transition-opacity duration-300 -z-20" />
+                    </>
                   )}
                 </button>
               ))}
             </div>
 
-            <Separator className="my-8 mx-4 bg-primary/20" />
+            <div className="my-8 mx-4 relative">
+              <Separator className="bg-primary/20" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-neon-cyan/20 to-transparent animate-slide" />
+            </div>
 
             {/* System Status */}
             <div className="px-4">
@@ -231,30 +260,39 @@ export function RAGLayout({ children, activeTab = 'upload', onTabChange }: RAGLa
                 SYSTEM STATUS
               </div>
               <div className="space-y-3 text-xs">
-                <div className="flex items-center justify-between p-2 rounded-lg bg-card/50 border border-primary/10">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-black/50 to-black/30 border border-neon-lime/20 hover:border-neon-lime/40 transition-all duration-300 group">
                   <div className="flex items-center gap-2">
-                    <Shield className="h-3 w-3 text-neon-lime" />
-                    <span className="text-muted-foreground font-cyber">Convex</span>
+                    <div className="relative">
+                      <Shield className="h-3 w-3 text-neon-lime relative z-10" />
+                      <div className="absolute inset-0 bg-neon-lime/50 blur-sm group-hover:blur-md transition-all duration-300" />
+                    </div>
+                    <span className="text-neon-lime/80 font-cyber group-hover:text-neon-lime transition-colors duration-300">Convex</span>
                   </div>
-                  <Badge className="text-xs bg-neon-lime/20 text-neon-lime border-neon-lime/30 animate-pulse">
+                  <Badge className="text-xs bg-neon-lime/20 text-neon-lime border-neon-lime/30 animate-neon-pulse">
                     CONNECTED
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between p-2 rounded-lg bg-card/50 border border-primary/10">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-black/50 to-black/30 border border-neon-cyan/20 hover:border-neon-cyan/40 transition-all duration-300 group">
                   <div className="flex items-center gap-2">
-                    <Database className="h-3 w-3 text-neon-cyan" />
-                    <span className="text-muted-foreground font-cyber">Vector DB</span>
+                    <div className="relative">
+                      <Database className="h-3 w-3 text-neon-cyan relative z-10" />
+                      <div className="absolute inset-0 bg-neon-cyan/50 blur-sm group-hover:blur-md transition-all duration-300" />
+                    </div>
+                    <span className="text-neon-cyan/80 font-cyber group-hover:text-neon-cyan transition-colors duration-300">Vector DB</span>
                   </div>
-                  <Badge className="text-xs bg-neon-cyan/20 text-neon-cyan border-neon-cyan/30 animate-pulse">
+                  <Badge className="text-xs bg-neon-cyan/20 text-neon-cyan border-neon-cyan/30 animate-neon-pulse">
                     READY
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between p-2 rounded-lg bg-card/50 border border-primary/10">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-black/50 to-black/30 border border-neon-purple/20 hover:border-neon-purple/40 transition-all duration-300 group">
                   <div className="flex items-center gap-2">
-                    <Zap className="h-3 w-3 text-neon-purple" />
-                    <span className="text-muted-foreground font-cyber">AI Engine</span>
+                    <div className="relative">
+                      <Zap className="h-3 w-3 text-neon-purple relative z-10" />
+                      <div className="absolute inset-0 bg-neon-purple/50 blur-sm group-hover:blur-md transition-all duration-300" />
+                    </div>
+                    <span className="text-neon-purple/80 font-cyber group-hover:text-neon-purple transition-colors duration-300">AI Engine</span>
                   </div>
-                  <Badge className="text-xs bg-neon-purple/20 text-neon-purple border-neon-purple/30 animate-pulse">
+                  <Badge className="text-xs bg-neon-purple/20 text-neon-purple border-neon-purple/30 animate-neon-pulse">
                     ACTIVE
                   </Badge>
                 </div>
@@ -265,10 +303,19 @@ export function RAGLayout({ children, activeTab = 'upload', onTabChange }: RAGLa
 
         {/* Main Content */}
         <main className="flex-1 overflow-hidden relative">
+          <div className="absolute inset-0 cyber-grid-animated opacity-[0.03]" />
           <div className="h-full p-8 relative z-10">
             <div className="max-w-full">
               {children}
             </div>
+          </div>
+          
+          {/* Corner decorations */}
+          <div className="absolute top-4 right-4">
+            <PulsingOrb size={40} color="cyan" className="opacity-20" />
+          </div>
+          <div className="absolute bottom-4 left-4">
+            <PulsingOrb size={50} color="purple" className="opacity-15" />
           </div>
         </main>
       </div>
