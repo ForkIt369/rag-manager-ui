@@ -1,271 +1,238 @@
 'use client';
 
-import React, { useState } from 'react';
-import { DashboardLayout } from '@/components/rag/dashboard-layout';
-import { SplitViewLayout } from '@/components/rag/split-view-layout';
-import { DocumentUpload } from '@/components/rag/document-upload';
-import { KnowledgeBaseBrowser } from '@/components/rag/knowledge-base-browser';
-import { QueryInterface } from '@/components/rag/query-interface';
-import { AnalyticsDashboard } from '@/components/rag/analytics-dashboard';
-import { SettingsPage } from '@/components/rag/settings-page';
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from '@/components/ui/tabs';
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from '@/components/ui/resizable';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
+  FileText, 
   Upload, 
-  Database, 
-  MessageSquare, 
-  FileText,
-  Plus,
-  LayoutGrid,
-  List,
-  SplitSquareVertical
+  Search, 
+  Activity,
+  TrendingUp,
+  Users,
+  Calendar,
+  BarChart3,
+  Clock,
+  Zap,
+  Database,
+  Brain
 } from 'lucide-react';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
-type ViewMode = 'grid' | 'list' | 'split';
-type WorkflowMode = 'browse' | 'upload' | 'query' | 'analyze';
+interface StatCard {
+  title: string;
+  value: string | number;
+  change?: string;
+  icon: React.ElementType;
+  color: string;
+  trend?: 'up' | 'down';
+}
+
+const stats: StatCard[] = [
+  {
+    title: 'Total Documents',
+    value: '1,234',
+    change: '+12%',
+    icon: FileText,
+    color: 'bg-blue-500',
+    trend: 'up',
+  },
+  {
+    title: 'Queries Today',
+    value: '89',
+    change: '+23%',
+    icon: Search,
+    color: 'bg-green-500',
+    trend: 'up',
+  },
+  {
+    title: 'Active Users',
+    value: '42',
+    change: '+5%',
+    icon: Users,
+    color: 'bg-purple-500',
+    trend: 'up',
+  },
+  {
+    title: 'Processing Speed',
+    value: '0.8s',
+    change: '-15%',
+    icon: Zap,
+    color: 'bg-orange-500',
+    trend: 'down',
+  },
+];
+
+const recentActivities = [
+  {
+    icon: Upload,
+    title: 'Q4 Financial Report.pdf uploaded',
+    time: '2 hours ago',
+    user: 'John Doe',
+  },
+  {
+    icon: Search,
+    title: 'Query: "What are our Q3 revenue figures?"',
+    time: '3 hours ago',
+    user: 'Jane Smith',
+  },
+  {
+    icon: FileText,
+    title: 'Marketing Strategy 2025.docx processed',
+    time: '5 hours ago',
+    user: 'System',
+  },
+  {
+    icon: Brain,
+    title: 'Knowledge base index updated',
+    time: '1 day ago',
+    user: 'System',
+  },
+];
 
 export default function DashboardPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>('split');
-  const [workflowMode, setWorkflowMode] = useState<WorkflowMode>('browse');
-  const [selectedDocument, setSelectedDocument] = useState<any>(null);
-  const [activeQueryTab, setActiveQueryTab] = useState('new');
-  
-  // Query tabs management
-  const [queryTabs, setQueryTabs] = useState([
-    { id: 'new', title: 'New Query', content: null }
-  ]);
+  return (
+    <div className="space-y-6">
+      {/* Welcome Section */}
+      <div>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <p className="text-gray-500 mt-1">
+          Welcome back! Here's what's happening with your knowledge base today.
+        </p>
+      </div>
 
-  const addQueryTab = () => {
-    const newTab = {
-      id: `query-${Date.now()}`,
-      title: `Query ${queryTabs.length}`,
-      content: null
-    };
-    setQueryTabs([...queryTabs, newTab]);
-    setActiveQueryTab(newTab.id);
-  };
-
-  const closeQueryTab = (tabId: string) => {
-    if (queryTabs.length > 1) {
-      const newTabs = queryTabs.filter(tab => tab.id !== tabId);
-      setQueryTabs(newTabs);
-      if (activeQueryTab === tabId) {
-        setActiveQueryTab(newTabs[0].id);
-      }
-    }
-  };
-
-  const renderWorkflowContent = () => {
-    switch (workflowMode) {
-      case 'upload':
-        return (
-          <div className="h-full p-6">
-            <DocumentUpload 
-              onUploadComplete={(documentId) => {
-                console.log('Document uploaded:', documentId);
-                setWorkflowMode('browse');
-              }}
-            />
-          </div>
-        );
-
-      case 'query':
-        return (
-          <div className="h-full flex flex-col">
-            <Tabs value={activeQueryTab} onValueChange={setActiveQueryTab} className="flex-1">
-              <div className="border-b px-4">
-                <div className="flex items-center justify-between">
-                  <TabsList className="h-12 p-0 bg-transparent">
-                    {queryTabs.map((tab) => (
-                      <TabsTrigger 
-                        key={tab.id} 
-                        value={tab.id}
-                        className="relative px-4 h-12 data-[state=active]:bg-background data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
-                      >
-                        <span>{tab.title}</span>
-                        {queryTabs.length > 1 && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              closeQueryTab(tab.id);
-                            }}
-                            className="ml-2 hover:bg-muted rounded p-1"
-                          >
-                            ×
-                          </button>
-                        )}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={addQueryTab}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat) => (
+          <Card key={stat.title}>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">{stat.title}</p>
+                  <p className="text-2xl font-bold mt-1">{stat.value}</p>
+                  {stat.change && (
+                    <p className={cn(
+                      'text-sm mt-1',
+                      stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                    )}>
+                      {stat.change} from last month
+                    </p>
+                  )}
+                </div>
+                <div className={cn('p-3 rounded-lg', stat.color)}>
+                  <stat.icon className="h-6 w-6 text-white" />
                 </div>
               </div>
-              {queryTabs.map((tab) => (
-                <TabsContent key={tab.id} value={tab.id} className="flex-1 p-0">
-                  <QueryInterface />
-                </TabsContent>
-              ))}
-            </Tabs>
-          </div>
-        );
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-      case 'analyze':
-        return (
-          <div className="h-full p-6">
-            <AnalyticsDashboard />
-          </div>
-        );
-
-      case 'browse':
-      default:
-        if (viewMode === 'split') {
-          return (
-            <SplitViewLayout
-              leftPanel={
-                <KnowledgeBaseBrowser 
-                  onDocumentSelect={setSelectedDocument}
-                />
-              }
-              rightPanel={
-                selectedDocument ? (
-                  <div className="p-6">
-                    <div className="max-w-4xl mx-auto space-y-6">
-                      <div>
-                        <h1 className="text-2xl font-bold mb-2">
-                          {selectedDocument.title}
-                        </h1>
-                        <p className="text-muted-foreground">
-                          {selectedDocument.metadata?.filename}
-                        </p>
-                      </div>
-                      
-                      <Tabs defaultValue="content" className="w-full">
-                        <TabsList className="grid w-full grid-cols-3">
-                          <TabsTrigger value="content">Content</TabsTrigger>
-                          <TabsTrigger value="query">Query</TabsTrigger>
-                          <TabsTrigger value="metadata">Metadata</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="content" className="space-y-4">
-                          <div className="prose dark:prose-invert max-w-none">
-                            <p>Document content would be displayed here...</p>
-                          </div>
-                        </TabsContent>
-                        <TabsContent value="query">
-                          <QueryInterface documentContext={selectedDocument} />
-                        </TabsContent>
-                        <TabsContent value="metadata">
-                          <pre className="p-4 bg-muted rounded-lg overflow-auto">
-                            {JSON.stringify(selectedDocument.metadata, null, 2)}
-                          </pre>
-                        </TabsContent>
-                      </Tabs>
-                    </div>
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent Activity */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Recent Activity</CardTitle>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/activity">View all</Link>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentActivities.map((activity, index) => (
+                <div key={index} className="flex items-start gap-4">
+                  <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800">
+                    <activity.icon className="h-4 w-4" />
                   </div>
-                ) : (
-                  <div className="flex items-center justify-center h-full text-muted-foreground">
-                    <div className="text-center space-y-2">
-                      <FileText className="h-12 w-12 mx-auto opacity-50" />
-                      <p>Select a document to view details</p>
-                    </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{activity.title}</p>
+                    <p className="text-xs text-gray-500">
+                      {activity.user} • {activity.time}
+                    </p>
                   </div>
-                )
-              }
-              leftPanelTitle="Knowledge Base"
-              rightPanelTitle={selectedDocument?.title || "Document Details"}
-              defaultLeftWidth={400}
-            />
-          );
-        }
-
-        return (
-          <div className="h-full p-6">
-            <KnowledgeBaseBrowser 
-              onDocumentSelect={setSelectedDocument}
-            />
-          </div>
-        );
-    }
-  };
-
-  return (
-    <DashboardLayout>
-      <div className="h-screen flex flex-col">
-        {/* Workflow Navigation */}
-        <div className="border-b bg-background">
-          <div className="flex items-center justify-between px-6 py-3">
-            <div className="flex items-center gap-2">
-              {[
-                { id: 'browse', label: 'Browse', icon: Database },
-                { id: 'upload', label: 'Upload', icon: Upload },
-                { id: 'query', label: 'Query', icon: MessageSquare },
-                { id: 'analyze', label: 'Analytics', icon: FileText }
-              ].map((mode) => (
-                <Button
-                  key={mode.id}
-                  variant={workflowMode === mode.id ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setWorkflowMode(mode.id as WorkflowMode)}
-                  className="gap-2"
-                >
-                  <mode.icon className="h-4 w-4" />
-                  {mode.label}
-                </Button>
+                </div>
               ))}
             </div>
+          </CardContent>
+        </Card>
 
-            {workflowMode === 'browse' && (
-              <div className="flex items-center gap-1 bg-muted p-1 rounded-md">
-                <Button
-                  variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                  className="h-7 w-7 p-0"
-                >
-                  <LayoutGrid className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className="h-7 w-7 p-0"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'split' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('split')}
-                  className="h-7 w-7 p-0"
-                >
-                  <SplitSquareVertical className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex-1 overflow-hidden">
-          {renderWorkflowContent()}
-        </div>
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Button className="w-full justify-start gap-2" variant="outline" asChild>
+                <Link href="/documents/upload">
+                  <Upload className="h-4 w-4" />
+                  Upload Document
+                </Link>
+              </Button>
+              <Button className="w-full justify-start gap-2" variant="outline" asChild>
+                <Link href="/query">
+                  <Search className="h-4 w-4" />
+                  New Query
+                </Link>
+              </Button>
+              <Button className="w-full justify-start gap-2" variant="outline" asChild>
+                <Link href="/documents">
+                  <FileText className="h-4 w-4" />
+                  Browse Documents
+                </Link>
+              </Button>
+              <Button className="w-full justify-start gap-2" variant="outline" asChild>
+                <Link href="/analytics">
+                  <BarChart3 className="h-4 w-4" />
+                  View Analytics
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </DashboardLayout>
+
+      {/* Performance Overview */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>System Performance</CardTitle>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/analytics/performance">
+                View details
+              </Link>
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <Database className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+              <p className="text-sm text-gray-500">Vector Database</p>
+              <p className="text-lg font-semibold">98.5% Uptime</p>
+            </div>
+            <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <Brain className="h-8 w-8 mx-auto mb-2 text-purple-500" />
+              <p className="text-sm text-gray-500">AI Processing</p>
+              <p className="text-lg font-semibold">0.8s Avg</p>
+            </div>
+            <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <Activity className="h-8 w-8 mx-auto mb-2 text-green-500" />
+              <p className="text-sm text-gray-500">API Response</p>
+              <p className="text-lg font-semibold">124ms</p>
+            </div>
+            <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <Clock className="h-8 w-8 mx-auto mb-2 text-orange-500" />
+              <p className="text-sm text-gray-500">Queue Time</p>
+              <p className="text-lg font-semibold">2.1s</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
