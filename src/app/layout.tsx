@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Rajdhani, Orbitron } from "next/font/google";
-import "./globals.css";
+import "./app.css";
 
 const rajdhani = Rajdhani({
   variable: "--font-rajdhani",
