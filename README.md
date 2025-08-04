@@ -1,6 +1,6 @@
-# RAG Manager UI
+# BroVerse Rag UI
 
-A comprehensive Retrieval Augmented Generation (RAG) system user interface built with Next.js 14, TypeScript, and Tailwind CSS. This modern, responsive web application provides a complete interface for managing documents, performing vector searches, and analyzing system performance.
+A comprehensive Retrieval Augmented Generation (RAG) system user interface built with Next.js 14, TypeScript, and Tailwind CSS. The Ultimate Knowledge Intelligence Platform provides a complete interface for managing documents, performing vector searches, and analyzing system performance.
 
 ## 🚀 Features
 
@@ -50,7 +50,7 @@ A comprehensive Retrieval Augmented Generation (RAG) system user interface built
 ## 🏗️ Project Structure
 
 ```
-rag-manager-ui/
+broverse-rag-ui/
 ├── src/
 │   ├── app/                    # Next.js app router pages
 │   │   ├── globals.css         # Global styles
@@ -94,7 +94,7 @@ rag-manager-ui/
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd rag-manager-ui
+   cd broverse-rag-ui
    ```
 
 2. **Install dependencies**
@@ -259,4 +259,4 @@ For questions and support:
 
 ---
 
-Built with ❤️ using modern web technologies for an exceptional RAG system experience.
+Built with ❤️ using modern web technologies for an exceptional knowledge intelligence experience.

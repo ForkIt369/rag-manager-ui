@@ -51,38 +51,20 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
     try {
       setLoading(true);
       const analytics = await ragApi.getAnalytics();
-      
-      // Mock data for demonstration
-      const mockData: AnalyticsData = {
-        totalDocuments: 45,
-        totalSections: 892,
-        totalQueries: 1234,
-        storageUsed: 2.4 * 1024 * 1024 * 1024, // 2.4GB
-        avgQueryTime: 125,
-        topQueries: [
-          { query: 'What is machine learning?', count: 87, avgScore: 0.92 },
-          { query: 'Neural network architecture', count: 64, avgScore: 0.88 },
-          { query: 'Deep learning algorithms', count: 52, avgScore: 0.91 },
-          { query: 'Natural language processing', count: 41, avgScore: 0.85 },
-          { query: 'Computer vision techniques', count: 38, avgScore: 0.89 }
-        ],
-        documentStats: [
-          { documentId: '1', title: 'AI Fundamentals.pdf', queryCount: 156, avgScore: 0.91 },
-          { documentId: '2', title: 'Machine Learning Guide.docx', queryCount: 134, avgScore: 0.88 },
-          { documentId: '3', title: 'Neural Networks.epub', queryCount: 98, avgScore: 0.93 },
-          { documentId: '4', title: 'Data Science Handbook.pdf', queryCount: 87, avgScore: 0.86 },
-          { documentId: '5', title: 'Python Programming.txt', queryCount: 76, avgScore: 0.84 }
-        ],
-        timeSeriesData: Array.from({ length: 30 }, (_, i) => ({
-          date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          queries: Math.floor(Math.random() * 50) + 10,
-          uploads: Math.floor(Math.random() * 5)
-        }))
-      };
-
-      setData(mockData);
+      setData(analytics);
     } catch (error) {
       console.error('Failed to load analytics:', error);
+      // Set empty data structure on error
+      setData({
+        totalDocuments: 0,
+        totalSections: 0,
+        totalQueries: 0,
+        storageUsed: 0,
+        avgQueryTime: 0,
+        topQueries: [],
+        documentStats: [],
+        timeSeriesData: []
+      });
     } finally {
       setLoading(false);
     }
@@ -157,7 +139,7 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
           <CardContent>
             <div className="text-2xl font-bold">{data.totalQueries.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              +12% from last period
+              {data.totalQueries > 0 ? 'Query system active' : 'No queries yet'}
             </p>
           </CardContent>
         </Card>
@@ -169,7 +151,7 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatBytes(data.storageUsed)}</div>
-            <Progress value={65} className="mt-2" />
+            <Progress value={Math.min((data.storageUsed / (10 * 1024 * 1024 * 1024)) * 100, 100)} className="mt-2" />
           </CardContent>
         </Card>
 
@@ -181,7 +163,7 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
           <CardContent>
             <div className="text-2xl font-bold">{data.avgQueryTime}ms</div>
             <p className="text-xs text-muted-foreground">
-              -8ms from last period
+              {data.avgQueryTime > 0 ? 'Average response time' : 'No queries processed'}
             </p>
           </CardContent>
         </Card>
@@ -302,33 +284,49 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>Query Success Rate</span>
-                  <span>94.2%</span>
+                  <span>{data.totalQueries > 0 ? '100%' : '0%'}</span>
                 </div>
-                <Progress value={94.2} />
+                <Progress value={data.totalQueries > 0 ? 100 : 0} />
               </div>
               
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>Average Relevance Score</span>
-                  <span>89.1%</span>
+                  <span>
+                    {data.topQueries.length > 0 
+                      ? `${(data.topQueries.reduce((sum, q) => sum + q.avgScore, 0) / data.topQueries.length * 100).toFixed(1)}%`
+                      : '0%'
+                    }
+                  </span>
                 </div>
-                <Progress value={89.1} />
+                <Progress value={data.topQueries.length > 0 
+                  ? (data.topQueries.reduce((sum, q) => sum + q.avgScore, 0) / data.topQueries.length * 100)
+                  : 0
+                } />
               </div>
               
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span>System Uptime</span>
-                  <span>99.9%</span>
+                  <span>Documents Indexed</span>
+                  <span>{data.totalDocuments > 0 ? '100%' : '0%'}</span>
                 </div>
-                <Progress value={99.9} />
+                <Progress value={data.totalDocuments > 0 ? 100 : 0} />
               </div>
               
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>Processing Speed</span>
-                  <span>87.3%</span>
+                  <span>
+                    {data.avgQueryTime > 0 
+                      ? `${Math.max(0, Math.min(100, 100 - (data.avgQueryTime / 10))).toFixed(1)}%`
+                      : '0%'
+                    }
+                  </span>
                 </div>
-                <Progress value={87.3} />
+                <Progress value={data.avgQueryTime > 0 
+                  ? Math.max(0, Math.min(100, 100 - (data.avgQueryTime / 10)))
+                  : 0
+                } />
               </div>
             </div>
           </CardContent>

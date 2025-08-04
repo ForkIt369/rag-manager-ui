@@ -48,26 +48,13 @@ export function QueryInterface({ className }: QueryInterfaceProps) {
   }, []);
 
   const loadQueryHistory = async () => {
-    // Mock history for now - would be implemented in Convex
-    const mockHistory: QueryHistoryItem[] = [
-      {
-        id: '1',
-        query: 'What is machine learning?',
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-        resultCount: 5,
-        avgScore: 0.85,
-        executionTime: 120
-      },
-      {
-        id: '2',
-        query: 'Neural networks architecture',
-        timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-        resultCount: 8,
-        avgScore: 0.92,
-        executionTime: 95
-      }
-    ];
-    setHistory(mockHistory);
+    try {
+      const historyData = await ragApi.getQueryHistory(20);
+      setHistory(historyData);
+    } catch (error) {
+      console.error('Failed to load query history:', error);
+      setHistory([]);
+    }
   };
 
   const executeSearch = async (searchQuery?: string) => {
@@ -83,17 +70,34 @@ export function QueryInterface({ className }: QueryInterfaceProps) {
       
       setResults(searchResults || []);
 
-      // Add to history
-      const historyItem: QueryHistoryItem = {
-        id: Date.now().toString(),
-        query: queryToSearch,
-        timestamp: new Date().toISOString(),
-        resultCount: searchResults?.length || 0,
-        avgScore: searchResults?.reduce((sum: number, r: SearchResult) => sum + r.score, 0) / (searchResults?.length || 1) || 0,
-        executionTime
-      };
+      // Save query to backend and add to local history
+      try {
+        await ragApi.saveQuery(queryToSearch, searchResults || [], executionTime);
+        
+        const historyItem: QueryHistoryItem = {
+          id: Date.now().toString(),
+          query: queryToSearch,
+          timestamp: new Date().toISOString(),
+          resultCount: searchResults?.length || 0,
+          avgScore: searchResults?.reduce((sum: number, r: SearchResult) => sum + r.score, 0) / (searchResults?.length || 1) || 0,
+          executionTime
+        };
 
-      setHistory(prev => [historyItem, ...prev.slice(0, 19)]); // Keep last 20
+        setHistory(prev => [historyItem, ...prev.slice(0, 19)]); // Keep last 20
+      } catch (error) {
+        console.warn('Failed to save query to history:', error);
+        // Still add to local history even if backend save fails
+        const historyItem: QueryHistoryItem = {
+          id: Date.now().toString(),
+          query: queryToSearch,
+          timestamp: new Date().toISOString(),
+          resultCount: searchResults?.length || 0,
+          avgScore: searchResults?.reduce((sum: number, r: SearchResult) => sum + r.score, 0) / (searchResults?.length || 1) || 0,
+          executionTime
+        };
+
+        setHistory(prev => [historyItem, ...prev.slice(0, 19)]);
+      }
 
       if (!searchQuery) {
         setQuery('');
@@ -327,7 +331,7 @@ export function QueryInterface({ className }: QueryInterfaceProps) {
             <Button 
               variant="outline" 
               className="w-full justify-start"
-              onClick={() => setQuery("What is the main topic discussed?")}
+              onClick={() => setQuery("Summarize the main points")}
             >
               <MessageSquare className="h-4 w-4 mr-2" />
               Summarize Content
@@ -335,7 +339,7 @@ export function QueryInterface({ className }: QueryInterfaceProps) {
             <Button 
               variant="outline" 
               className="w-full justify-start"
-              onClick={() => setQuery("List the key concepts mentioned")}
+              onClick={() => setQuery("What are the key concepts?")}
             >
               <FileText className="h-4 w-4 mr-2" />
               Extract Key Concepts
@@ -343,7 +347,7 @@ export function QueryInterface({ className }: QueryInterfaceProps) {
             <Button 
               variant="outline" 
               className="w-full justify-start"
-              onClick={() => setQuery("Find relevant examples or case studies")}
+              onClick={() => setQuery("Find examples")}
             >
               <Search className="h-4 w-4 mr-2" />
               Find Examples

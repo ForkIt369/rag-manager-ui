@@ -1,4 +1,4 @@
-# RAG Manager UI - Setup Instructions
+# BroVerse Rag UI - Setup Instructions
 
 ## 🚀 Quick Setup Guide
 
@@ -7,8 +7,8 @@
 Since we hit the API rate limit, please manually create a GitHub repository:
 
 1. Go to https://github.com/new
-2. Repository name: `rag-manager-ui`
-3. Description: "A modern RAG Manager UI with document management, knowledge base, and analytics"
+2. Repository name: `broverse-rag-ui`
+3. Description: "BroVerse Rag - The Ultimate Knowledge Intelligence Platform with document management, knowledge base, and analytics"
 4. Set as Public repository
 5. **DON'T** initialize with README (we already have one)
 6. Click "Create repository"
@@ -18,10 +18,10 @@ Since we hit the API rate limit, please manually create a GitHub repository:
 After creating the repository, run these commands in your terminal:
 
 ```bash
-cd "/Users/digitaldavinci/Personal Projects/Convex Rag/rag-manager-ui"
+cd "/Users/digitaldavinci/Personal Projects/Convex Rag/broverse-rag-ui"
 
 # Add your GitHub remote (replace YOUR_USERNAME with your GitHub username)
-git remote add origin https://github.com/YOUR_USERNAME/rag-manager-ui.git
+git remote add origin https://github.com/YOUR_USERNAME/broverse-rag-ui.git
 
 # Push to GitHub
 git branch -M main
@@ -48,7 +48,7 @@ vercel
 #### Option B: Using Vercel Dashboard
 
 1. Go to https://vercel.com/new
-2. Import your GitHub repository: `rag-manager-ui`
+2. Import your GitHub repository: `broverse-rag-ui`
 3. Configure environment variables:
    ```
    NEXT_PUBLIC_CONVEX_URL=https://artful-ibis-284.convex.cloud

@@ -1,6 +1,6 @@
-# RAG Manager UI - Deployment Guide
+# BroVerse Rag UI - Deployment Guide
 
-This guide will help you deploy the RAG Manager UI to various platforms.
+This guide will help you deploy the BroVerse Rag UI to various platforms.
 
 ## 🚀 Quick Deployment on Vercel (Recommended)
 
@@ -15,9 +15,9 @@ This guide will help you deploy the RAG Manager UI to various platforms.
    ```bash
    git init
    git add .
-   git commit -m "Initial commit: RAG Manager UI"
+   git commit -m "Initial commit: BroVerse Rag UI"
    git branch -M main
-   git remote add origin https://github.com/yourusername/rag-manager-ui.git
+   git remote add origin https://github.com/yourusername/broverse-rag-ui.git
    git push -u origin main
    ```
 
@@ -86,10 +86,10 @@ CMD ["node", "server.js"]
 ### Docker Commands
 ```bash
 # Build the image
-docker build -t rag-manager-ui .
+docker build -t broverse-rag-ui .
 
 # Run the container
-docker run -p 3000:3000 -e NEXT_PUBLIC_CONVEX_URL=your-convex-url rag-manager-ui
+docker run -p 3000:3000 -e NEXT_PUBLIC_CONVEX_URL=your-convex-url broverse-rag-ui
 ```
 
 ## 🌐 Manual Deployment
@@ -102,8 +102,8 @@ docker run -p 3000:3000 -e NEXT_PUBLIC_CONVEX_URL=your-convex-url rag-manager-ui
 
 1. **Clone and Install**
    ```bash
-   git clone https://github.com/yourusername/rag-manager-ui.git
-   cd rag-manager-ui
+   git clone https://github.com/yourusername/broverse-rag-ui.git
+   cd broverse-rag-ui
    npm install
    ```
 
@@ -122,7 +122,7 @@ docker run -p 3000:3000 -e NEXT_PUBLIC_CONVEX_URL=your-convex-url rag-manager-ui
    ```bash
    npm start
    # Or with PM2
-   pm2 start npm --name "rag-manager-ui" -- start
+   pm2 start npm --name "broverse-rag-ui" -- start
    ```
 
 ## 🔧 Configuration
