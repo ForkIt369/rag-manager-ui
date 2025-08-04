@@ -59,7 +59,7 @@ export default function Home() {
             </div>
             <div>
               <h3 className="font-semibold text-neon-cyan">Try the New Dashboard Experience</h3>
-              <p className="text-sm text-muted-foreground">Enhanced navigation, split views, and command palette</p>
+              <p className="text-sm text-muted-foreground">Enhanced navigation, split views, and command palette (⌘K)</p>
             </div>
           </div>
           <Link href="/dashboard">
