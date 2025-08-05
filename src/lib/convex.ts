@@ -16,36 +16,55 @@ export class RAGApiClient {
 
   // Document operations
   async uploadDocument(file: File, metadata?: any) {
-    const formData = new FormData();
-    formData.append('file', file);
-    if (metadata) {
-      formData.append('metadata', JSON.stringify(metadata));
-    }
-
-    // This would typically use the Convex file storage API
-    // For now, we'll simulate the upload process
     try {
-      return await this.client.mutation("documents:createDocument" as any, { 
-        title: file.name,
+      // Step 1: Get upload URL from Convex
+      const uploadUrl = await this.client.mutation("documentUpload:generateUploadUrl" as any);
+      
+      // Step 2: Upload file to Convex storage
+      const result = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file
+      });
+      
+      if (!result.ok) {
+        throw new Error('Failed to upload file to storage');
+      }
+      
+      const { storageId } = await result.json();
+      
+      // Step 3: Save document record
+      return await this.client.mutation("documentUpload:saveDocument" as any, {
+        storageId,
         fileName: file.name,
-        fileSize: file.size,
         fileType: file.type,
-        metadata,
-        tags: metadata?.tags || [],
-        source: metadata?.source || 'manual_upload'
+        fileSize: file.size,
+        title: metadata?.title || file.name,
+        tags: metadata?.tags || []
       });
     } catch (error) {
-      // Mock response for development
-      return { documentId: `doc_${Date.now()}` };
+      console.error("Failed to upload document:", error);
+      // Fallback to mock upload for development
+      try {
+        return await this.client.mutation("documents:upload", {
+          filename: file.name,
+          size: file.size,
+          type: file.type,
+          metadata
+        });
+      } catch (mockError) {
+        console.error("Mock upload also failed:", mockError);
+        throw error;
+      }
     }
   }
 
   async getDocuments(filter?: any) {
     try {
-      return await this.client.query("documents:listDocuments" as any, filter || {});
+      return await this.client.query("documents:listDocuments", filter || {});
     } catch (error) {
       console.warn("Documents not available:", error);
-      return [];
+      return { documents: [] };
     }
   }
 
@@ -153,7 +172,7 @@ export class RAGApiClient {
   async getAnalytics() {
     try {
       // Try to use the dedicated analytics function first
-      const analyticsData = await this.client.query("analytics:getSystemAnalytics" as any, {});
+      const analyticsData = await this.client.query("analytics:getSystemAnalytics", {});
       if (analyticsData) {
         return analyticsData;
       }
@@ -164,9 +183,9 @@ export class RAGApiClient {
     try {
       // Fallback to manual aggregation
       const [documents, chunks, queries] = await Promise.all([
-        this.client.query("documents:listDocuments" as any, { limit: 1000 }),
-        this.client.query("chunks:getAllChunks" as any, {}) || { chunks: [] },
-        this.client.query("queries:listQueries" as any, { limit: 1000 }) || { queries: [] }
+        this.client.query("documents:listDocuments", { limit: 1000 }),
+        this.client.query("chunks:getAllChunks", {}) || { chunks: [] },
+        this.client.query("queries:listQueries", { limit: 1000 }) || { queries: [] }
       ]);
 
       const documentsList = documents?.documents || [];

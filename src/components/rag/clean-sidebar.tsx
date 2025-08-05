@@ -11,6 +11,7 @@ import {
   Search,
   BarChart3,
   Settings,
+  Activity,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -42,6 +43,11 @@ const navItems: NavItem[] = [
     label: 'Analytics',
     href: '/dashboard/analytics',
     icon: BarChart3,
+  },
+  {
+    label: 'Diagnostics',
+    href: '/dashboard/diagnostics',
+    icon: Activity,
   },
   {
     label: 'Settings',

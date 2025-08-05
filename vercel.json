@@ -2,5 +2,13 @@
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_CONVEX_URL": "https://artful-ibis-284.convex.cloud"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_CONVEX_URL": "https://artful-ibis-284.convex.cloud"
+    }
+  }
 }

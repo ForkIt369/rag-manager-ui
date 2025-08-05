@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalMutation, internalQuery } from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
 
 // List documents with optional filtering
@@ -164,5 +164,74 @@ export const upload = mutation({
     });
     
     return { documentId };
+  },
+});
+
+// Internal mutation for creating documents from actions
+export const create = internalMutation({
+  args: {
+    title: v.string(),
+    fileName: v.string(),
+    fileId: v.id("_storage"),
+    fileSize: v.number(),
+    fileType: v.string(),
+    tags: v.array(v.string()),
+    source: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const documentId = await ctx.db.insert("documents", {
+      ...args,
+      status: "pending",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+    return documentId;
+  },
+});
+
+// Internal queries and mutations for document processor
+export const getById = internalQuery({
+  args: { id: v.id("documents") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
+export const updateStatus = internalMutation({
+  args: {
+    id: v.id("documents"),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("processing"),
+      v.literal("completed"),
+      v.literal("error")
+    ),
+    error: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, {
+      status: args.status,
+      error: args.error,
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+export const updateProcessingComplete = internalMutation({
+  args: {
+    id: v.id("documents"),
+    chunkCount: v.number(),
+    processingTime: v.number(),
+    metadata: v.any(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, {
+      status: "completed",
+      chunkCount: args.chunkCount,
+      processingTime: args.processingTime,
+      metadata: args.metadata,
+      processedAt: Date.now(),
+      updatedAt: Date.now(),
+    });
   },
 });

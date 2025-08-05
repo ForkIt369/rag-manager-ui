@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalMutation } from "./_generated/server";
 
 // List recent queries
 export const listQueries = query({
@@ -28,6 +28,29 @@ export const getQuery = query({
 
 // Create a new query record
 export const createQuery = mutation({
+  args: {
+    queryText: v.string(),
+    resultCount: v.number(),
+    topScore: v.float64(),
+    responseTimeMs: v.number(),
+    results: v.optional(v.array(v.any())),
+  },
+  handler: async (ctx, args) => {
+    const queryId = await ctx.db.insert("queries", {
+      queryText: args.queryText,
+      resultCount: args.resultCount,
+      topScore: args.topScore,
+      responseTimeMs: args.responseTimeMs,
+      results: args.results || [],
+      createdAt: Date.now(),
+    });
+    
+    return { queryId };
+  },
+});
+
+// Internal mutation for creating queries from actions
+export const internalCreateQuery = internalMutation({
   args: {
     queryText: v.string(),
     resultCount: v.number(),
