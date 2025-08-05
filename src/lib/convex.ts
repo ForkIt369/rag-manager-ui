@@ -25,11 +25,14 @@ export class RAGApiClient {
     // This would typically use the Convex file storage API
     // For now, we'll simulate the upload process
     try {
-      return await this.client.mutation("documents:upload" as any, { 
-        filename: file.name,
-        size: file.size,
-        type: file.type,
-        metadata 
+      return await this.client.mutation("documents:createDocument" as any, { 
+        title: file.name,
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        metadata,
+        tags: metadata?.tags || [],
+        source: metadata?.source || 'manual_upload'
       });
     } catch (error) {
       // Mock response for development
@@ -39,7 +42,7 @@ export class RAGApiClient {
 
   async getDocuments(filter?: any) {
     try {
-      return await this.client.query("documents:list" as any, filter || {});
+      return await this.client.query("documents:listDocuments" as any, filter || {});
     } catch (error) {
       console.warn("Documents not available:", error);
       return [];
@@ -48,7 +51,7 @@ export class RAGApiClient {
 
   async getDocument(id: string) {
     try {
-      return await this.client.query("documents:get" as any, { id });
+      return await this.client.query("documents:getDocument" as any, { id });
     } catch (error) {
       console.warn("Document not available:", error);
       return null;
@@ -57,7 +60,7 @@ export class RAGApiClient {
 
   async deleteDocument(id: string) {
     try {
-      return await this.client.mutation("documents:delete" as any, { id });
+      return await this.client.mutation("documents:deleteDocument" as any, { id });
     } catch (error) {
       console.warn("Delete document not available:", error);
       return null;
@@ -66,7 +69,7 @@ export class RAGApiClient {
 
   async updateDocument(id: string, updates: any) {
     try {
-      return await this.client.mutation("documents:update" as any, { id, ...updates });
+      return await this.client.mutation("documents:updateDocument" as any, { id, ...updates });
     } catch (error) {
       console.warn("Update document not available:", error);
       return null;
