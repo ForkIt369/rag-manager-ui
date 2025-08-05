@@ -1,11 +1,17 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-// Get all chunks - used by analytics
+// Get all chunks (limited for analytics)
 export const getAllChunks = query({
-  args: {},
-  handler: async (ctx) => {
-    const chunks = await ctx.db.query("chunks").collect();
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const limit = args.limit || 1000;
+    const chunks = await ctx.db
+      .query("chunks")
+      .take(limit);
+    
     return { chunks };
   },
 });
@@ -19,21 +25,6 @@ export const getDocumentChunks = query({
       .withIndex("by_document", (q) => q.eq("documentId", args.documentId))
       .order("asc")
       .collect();
-    
-    return { chunks };
-  },
-});
-
-// Get all chunks (limited for analytics)
-export const getAllChunks = query({
-  args: {
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const limit = args.limit || 1000;
-    const chunks = await ctx.db
-      .query("chunks")
-      .take(limit);
     
     return { chunks };
   },
