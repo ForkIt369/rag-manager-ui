@@ -31,10 +31,17 @@ export class PDFParser implements FileProcessor {
       logger.info({ size: fileBuffer.length }, 'Processing PDF with PDF.co')
       
       // Upload file to PDF.co temporary storage
-      const fileUrl = await this.pdfcoClient.uploadFile(
-        fileBuffer,
-        `document-${Date.now()}.pdf`
-      )
+      let fileUrl: string
+      try {
+        fileUrl = await this.pdfcoClient.uploadFile(
+          fileBuffer,
+          `document-${Date.now()}.pdf`
+        )
+        logger.info({ fileUrl }, 'File uploaded to PDF.co')
+      } catch (uploadError) {
+        logger.error({ error: uploadError }, 'Failed to upload file to PDF.co')
+        throw uploadError
+      }
       
       // Extract text and metadata in parallel
       const [extractedContent, pdfInfo, jsonData] = await Promise.all([
@@ -163,25 +170,60 @@ export class PDFParser implements FileProcessor {
   }
   
   private fallbackExtraction(buffer: Buffer): ProcessedContent {
-    // Very basic text extraction as last resort
-    const text = buffer.toString('utf-8', 0, Math.min(100000, buffer.length))
+    // Try to extract any readable text from PDF buffer
+    // PDFs contain text streams that might be readable
+    const bufferStr = buffer.toString('latin1')
     
-    // Extract readable text patterns
-    const matches = text.match(/[a-zA-Z0-9\s,.!?;:'"()-]{10,}/g) || []
-    const extracted = matches
-      .filter(match => match.trim().length > 10)
-      .join(' ')
-      .slice(0, 5000) // Limit to first 5000 chars
+    // Look for text between stream markers in PDF
+    const streamMatches = bufferStr.match(/stream\s*([\s\S]*?)\s*endstream/g) || []
+    let extractedText = ''
+    
+    for (const match of streamMatches) {
+      // Try to extract readable text from streams
+      const streamContent = match.replace(/^stream\s*/, '').replace(/\s*endstream$/, '')
+      // Look for readable ASCII text
+      const readable = streamContent.match(/[a-zA-Z0-9\s,.!?;:'"()\-]{20,}/g)
+      if (readable) {
+        extractedText += readable.join(' ') + ' '
+      }
+    }
+    
+    // Also try to find text in PDF objects
+    const textObjects = bufferStr.match(/\(([^)]+)\)/g) || []
+    for (const obj of textObjects) {
+      const text = obj.slice(1, -1) // Remove parentheses
+      if (text.length > 10 && /[a-zA-Z]/.test(text)) {
+        extractedText += text + ' '
+      }
+    }
+    
+    // Clean up the extracted text
+    extractedText = extractedText
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 10000) // Limit to 10K chars
+    
+    // If we still have no text, return a more informative error
+    if (!extractedText || extractedText.length < 50) {
+      extractedText = `Unable to extract text from PDF. The document may be:
+      1. Scanned/image-based (requires OCR)
+      2. Password protected
+      3. Corrupted or malformed
+      4. Using unsupported encoding
+      
+      Please ensure PDF.co API credentials are properly configured in production environment.`
+    }
     
     return {
-      content: extracted || 'PDF content extraction failed - please check PDF.co API configuration',
+      content: extractedText,
       metadata: {
         format: 'pdf',
         pageCount: 1,
         fileSize: buffer.length,
-        wordCount: extracted.split(/\s+/).length,
-        warning: 'Fallback extraction used - limited functionality',
-        extractedVia: 'Basic text pattern matching'
+        wordCount: extractedText.split(/\s+/).length,
+        warning: 'Fallback extraction used - limited functionality. PDF.co API may have failed.',
+        extractedVia: 'Emergency PDF text extraction',
+        error: 'PDF.co API extraction failed - using fallback'
       },
       images: []
     }
